@@ -1,17 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { registerFcmToken } from '@/libs/firebase/messaging';
 import { clearFcmToken, saveFcmToken } from '@/libs/api/notifications.api';
 
 type BrowserPermission = 'default' | 'granted' | 'denied' | 'unsupported';
-
-const getBrowserPermission = (): BrowserPermission => {
-  if (typeof window === 'undefined' || !('Notification' in window)) {
-    return 'unsupported';
-  }
-  return Notification.permission;
-};
 
 /** Notification API로 브라우저 알림 권한 요청 — granted여야 푸시 수신 가능 */
 const requestPermission = async (): Promise<BrowserPermission> => {
