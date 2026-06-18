@@ -2,13 +2,13 @@ importScripts('https://www.gstatic.com/firebasejs/12.15.0/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/12.15.0/firebase-messaging-compat.js');
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyAmbrfcXgsUjAtABXmpKt6Qg_3gCNYLTcU',
-  authDomain: 'miniprojext-8206f.firebaseapp.com',
-  projectId: 'miniprojext-8206f',
-  storageBucket: 'miniprojext-8206f.firebasestorage.app',
-  messagingSenderId: '267555140660',
-  appId: '1:267555140660:web:4b0384399affdedeea8661',
-  measurementId: 'G-C20B9YTZM7',
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 firebase.initializeApp(firebaseConfig);
