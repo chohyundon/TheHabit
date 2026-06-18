@@ -5,10 +5,33 @@ const FCM_SW_PATH = '/firebase-messaging-sw.js';
 
 let messagingInstance: Messaging | null = null;
 
-// Service Worker 등록
 const getServiceWorkerRegistration = async (): Promise<ServiceWorkerRegistration> => {
   const registration = await navigator.serviceWorker.register(FCM_SW_PATH);
+  await navigator.serviceWorker.ready;
   return registration;
+};
+
+export const getFirebaseMessaging = async (): Promise<Messaging | null> => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  try {
+    const supported = await isSupported();
+    if (!supported) {
+      return null;
+    }
+
+    if (!messagingInstance) {
+      await getServiceWorkerRegistration();
+      messagingInstance = getMessaging(firebaseApp);
+    }
+
+    return messagingInstance;
+  } catch (error) {
+    console.error('Firebase Messaging 초기화 실패:', error);
+    return null;
+  }
 };
 
 // FCM 토큰 등록

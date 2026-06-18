@@ -2,9 +2,36 @@
 
 import React, { useEffect, useState } from 'react';
 import { registerFcmToken } from '@/libs/firebase/messaging';
-import { clearFcmToken, getFcmTokenStatus, saveFcmToken } from '@/libs/api/notifications.api';
+import { clearFcmToken, saveFcmToken } from '@/libs/api/notifications.api';
 
 type BrowserPermission = 'default' | 'granted' | 'denied' | 'unsupported';
+
+const getBrowserPermission = (): BrowserPermission => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    return 'unsupported';
+  }
+  return Notification.permission;
+};
+
+/** Notification API로 브라우저 알림 권한 요청 — granted여야 푸시 수신 가능 */
+const requestPermission = async (): Promise<BrowserPermission> => {
+  if (typeof window === 'undefined' || !('Notification' in window)) {
+    console.warn('This browser does not support notifications.');
+    return 'unsupported';
+  }
+
+  const current = Notification.permission;
+  if (current === 'granted') {
+    return 'granted';
+  }
+
+  if (current === 'denied') {
+    return 'denied';
+  }
+
+  const result = await Notification.requestPermission();
+  return result;
+};
 
 const PERMISSION_LABEL: Record<BrowserPermission, string> = {
   default: '요청 전',
@@ -52,24 +79,6 @@ export const NotificationsPageContent = () => {
   const [pushError, setPushError] = useState<string | null>(null);
   const [permission, setPermission] = useState<BrowserPermission>('default');
 
-  useEffect(() => {
-    setPermission(Notification.permission);
-
-    const syncPushState = async () => {
-      try {
-        const { success, data } = await getFcmTokenStatus();
-        if (success && data?.hasToken) {
-          setPushEnabled(true);
-        }
-      } catch {
-        // 미로그인 등 — 토글 off 유지
-        setPushEnabled(false);
-      }
-    };
-
-    syncPushState();
-  }, []);
-
   const unreadCount = MOCK_NOTIFICATIONS.filter(n => !n.isRead).length;
   const filtered =
     activeTab === 'unread' ? MOCK_NOTIFICATIONS.filter(n => !n.isRead) : MOCK_NOTIFICATIONS;
@@ -84,37 +93,41 @@ export const NotificationsPageContent = () => {
         console.error('FCM 토큰 삭제 실패:', error);
       }
       setPushEnabled(false);
-
       return;
     }
 
-    const result = await Notification.requestPermission();
+    const result = await requestPermission();
     setPermission(result);
 
-    if (result !== 'granted') {
-      if (result === 'denied') {
-        setPushError('알림이 차단되어 있습니다. 설정에서 직접 변경해야 합니다.');
-      } else if (result === 'default') {
-        setPushError('알림 팝업에서 허용 또는 차단을 선택해주세요.');
+    if (result === 'granted') {
+      try {
+        const token = await registerFcmToken();
+
+        if (token) {
+          console.log('FCM token:', token);
+          await saveFcmToken(token);
+        }
+      } catch (error) {
+        console.error('FCM 토큰 등록 실패:', error);
+        const detail = error instanceof Error ? error.message : '푸시 토큰 등록에 실패했어요.';
+        setPushError(detail);
+        return;
       }
+      setPushEnabled(true);
       return;
     }
 
-    try {
-      const token = await registerFcmToken();
-
-      if (!token) {
-        setPushError('FCM 토큰을 발급하지 못했어요.');
-        return;
-      }
-
-      console.log('FCM token:', token);
-      await saveFcmToken(token);
-      setPushEnabled(true);
-    } catch (error) {
-      const detail = error instanceof Error ? error.message : '푸시 토큰 등록에 실패했어요.';
-      setPushError(detail);
+    if (result === 'unsupported') {
+      setPushError('이 브라우저는 알림을 지원하지 않아요.');
+      return;
     }
+
+    if (result === 'denied') {
+      setPushError('알림이 차단됨 → 주소창 자물쇠 → 사이트 설정에서 허용');
+      return;
+    }
+
+    setPushError('알림 권한이 필요해요.');
   };
 
   return (
@@ -157,7 +170,6 @@ export const NotificationsPageContent = () => {
             <button
               type='button'
               role='switch'
-              disabled={permission === 'unsupported'}
               aria-checked={pushEnabled}
               onClick={handlePushToggleClick}
               className={`relative inline-flex h-7 w-12 flex-shrink-0 items-center rounded-full transition-colors duration-200 ${
@@ -174,19 +186,19 @@ export const NotificationsPageContent = () => {
           <p className='text-xs text-gray-400 mt-2'>
             브라우저 권한: {PERMISSION_LABEL[permission]}
           </p>
-          <button
-            type='button'
-            disabled={permission === 'unsupported'}
-            onClick={handlePushToggleClick}
-            className={`mt-3 w-full py-2 text-sm font-semibold rounded-xl transition-opacity ${
-              pushEnabled
-                ? 'text-gray-600 bg-gray-100 hover:opacity-90'
-                : 'text-white bg-primary hover:opacity-90'
-            }`}
-          >
-            {pushEnabled ? '알림 끄기' : '알림 허용하기'}
-          </button>
-
+          {permission !== 'unsupported' && (
+            <button
+              type='button'
+              onClick={handlePushToggleClick}
+              className={`mt-3 w-full py-2 text-sm font-semibold rounded-xl transition-opacity ${
+                pushEnabled
+                  ? 'text-gray-600 bg-gray-100 hover:opacity-90'
+                  : 'text-white bg-primary hover:opacity-90'
+              }`}
+            >
+              {pushEnabled ? '알림 끄기' : '알림 허용하기'}
+            </button>
+          )}
           {pushError && <p className='text-xs text-red-500 mt-2'>{pushError}</p>}
         </div>
 
