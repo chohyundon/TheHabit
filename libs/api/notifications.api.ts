@@ -39,7 +39,20 @@ export const unsubscribePushNotification = async (
   }
 };
 
-// 3. FCM 토큰 저장 (Firebase Console 테스트용)
+// 3. FCM 토큰 등록 여부 조회
+export const getFcmTokenStatus = async (): Promise<ApiResponse<{ hasToken: boolean }>> => {
+  try {
+    const response = await axiosInstance.get<ApiResponse<{ hasToken: boolean }>>(
+      '/api/notifications/fcm-token'
+    );
+    return response.data;
+  } catch (error) {
+    console.error('FCM 토큰 상태 조회 실패:', error);
+    throw error;
+  }
+};
+
+// 4. FCM 토큰 저장 (Firebase Console 테스트용)
 export const saveFcmToken = async (token: string): Promise<ApiResponse<FcmTokenDto>> => {
   try {
     const response = await axiosInstance.post<ApiResponse<FcmTokenDto>>(
@@ -53,7 +66,7 @@ export const saveFcmToken = async (token: string): Promise<ApiResponse<FcmTokenD
   }
 };
 
-// 4. FCM 토큰 삭제
+// 5. FCM 토큰 삭제
 export const clearFcmToken = async (): Promise<ApiResponse<null>> => {
   try {
     const response = await axiosInstance.delete<ApiResponse<null>>('/api/notifications/fcm-token');
@@ -68,6 +81,7 @@ export const clearFcmToken = async (): Promise<ApiResponse<null>> => {
 export const notificationsApi = {
   subscribe: subscribePushNotification,
   unsubscribe: unsubscribePushNotification,
+  getFcmTokenStatus,
   saveFcmToken,
   clearFcmToken,
 };

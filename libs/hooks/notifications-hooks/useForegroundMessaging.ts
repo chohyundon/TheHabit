@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { onMessage, type MessagePayload } from 'firebase/messaging';
+import { getMessaging, onMessage, type MessagePayload } from 'firebase/messaging';
 import { Toast } from '@/app/_components/toasts/Toast';
-import { getFirebaseMessaging } from '@/libs/firebase/messaging';
+import { firebaseApp } from '@/firebase';
 
 const showForegroundNotification = async (payload: MessagePayload) => {
   const title = payload.notification?.title ?? payload.data?.title ?? 'TheHabit';
@@ -58,14 +58,14 @@ export const useForegroundMessaging = () => {
 
     const setup = async () => {
       try {
-        const messaging = await getFirebaseMessaging();
+        const messaging = getMessaging(firebaseApp);
         if (!messaging || cancelled) {
           return;
         }
 
         unsubscribe = onMessage(messaging, payload => {
           console.log('FCM foreground 수신:', payload);
-          void showForegroundNotification(payload);
+          showForegroundNotification(payload);
         });
       } catch (error) {
         console.error('FCM foreground 리스너 등록 실패:', error);

@@ -9,6 +9,38 @@ import { ClearFcmTokenUseCase } from '@/backend/notifications/application/usecas
 
 const fcmTokenRepository = new PrFcmTokenRepository();
 
+export async function GET(): Promise<NextResponse<ApiResponse<{ hasToken: boolean } | null>>> {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' },
+        },
+        { status: 401 }
+      );
+    }
+
+    const token = await fcmTokenRepository.findTokenByUserId(session.user.id);
+
+    return NextResponse.json({
+      success: true,
+      data: { hasToken: Boolean(token) },
+      message: 'FCM 토큰 상태를 조회했습니다.',
+    });
+  } catch (error) {
+    console.error('FCM 토큰 조회 오류:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: { code: 'FCM_TOKEN_GET_FAILED', message: 'FCM 토큰 조회에 실패했습니다.' },
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<ApiResponse<FcmTokenDto | null>>> {
