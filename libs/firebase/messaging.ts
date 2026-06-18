@@ -14,7 +14,6 @@ const getServiceWorkerRegistration = async (): Promise<ServiceWorkerRegistration
 // FCM 토큰 등록
 export const registerFcmToken = async (): Promise<string | null> => {
   const messaging = getMessaging(firebaseApp);
-  await getServiceWorkerRegistration();
 
   if (!messaging) {
     return null;
@@ -30,8 +29,11 @@ export const registerFcmToken = async (): Promise<string | null> => {
   }
 
   try {
+    const registration = await getServiceWorkerRegistration();
+
     return await getToken(messaging, {
       vapidKey,
+      serviceWorkerRegistration: registration,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
