@@ -4,16 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Quick Start
 
-**Setup**: Install dependencies with `yarn install` (the project uses Yarn 1.22.22 as the package manager).
+**Setup**: Install dependencies with `bun install` (primary package manager; `npm install` also supported).
 
 **Development**:
 ```bash
-yarn dev          # Start dev server with Turbopack on 0.0.0.0:3000
-yarn build        # Build for production (runs `prisma generate` first)
-yarn start        # Start production server
-yarn lint         # Run ESLint
-yarn format       # Format code with Prettier
-yarn format:check # Check formatting without changes
+bun run dev       # Start dev server on 0.0.0.0:3000
+bun run build     # Build for production
+bun start         # Start production server
+bun run lint      # Run ESLint
+bun run format    # Format code with Prettier
+bun run format:check # Check formatting without changes
 ```
 
 The `.env` file is required for API keys (database, auth providers, S3, OpenAI, etc.) — ask the user if missing.
@@ -85,7 +85,7 @@ Example: For creating a challenge:
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **Runtime** | Bun (also Yarn/npm compatible) | JavaScript runtime |
+| **Runtime** | Bun (npm also supported) | JavaScript runtime |
 | **Framework** | Next.js 16 | Full-stack React framework with SSR |
 | **Frontend** | React 19, TypeScript, Tailwind CSS, Antd | UI components & styling |
 | **State** | Zustand | Global UI state (modals, etc.) |
@@ -206,7 +206,7 @@ Types: `feat`, `fix`, `docs`, `test`, `refact`, `style`, `chore`
 6. Add TanStack Query hooks in `libs/api/` if needed
 
 **Debugging**:
-- Backend: Check server logs in `yarn dev` output
+- Backend: Check server logs in `bun run dev` output
 - Frontend: Use React DevTools, check browser console
 - Database: Use `prisma studio` to inspect data
 
