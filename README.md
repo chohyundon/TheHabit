@@ -16,11 +16,13 @@
       - [Frontend](#frontend)
   * [기능 소개](#기능-소개)
     + [메인 시스템 소개](#메인-시스템-소개)
+    + [온보딩 / 라우팅](#온보딩--라우팅)
     + [회원가입 / 로그인](#회원가입--로그인)
     + [메인 대시보드](#메인-대시보드)
     + [피드백](#피드백)
     + [유저 페이지](#유저-페이지)
-    + [Next-PWA를 활용한 푸시 알림 (2025.08.31 시점 개발중)](#next-pwa를-활용한-푸시-알림-20250831-시점-개발중)
+    + [FCM 푸시 알림](#fcm-푸시-알림)
+  * [추가 개선 사항 (2025~2026)](#추가-개선-사항-20252026)
   * [트러블 슈팅](#트러블-슈팅)
 - [프로젝트 아키텍처 소개 (클린 아키텍처 적용)](#프로젝트-아키텍처-소개-클린-아키텍처-적용)
 
@@ -49,12 +51,13 @@ npm install
 ```
 
 ### 3. 환경 변수 설정
-- 환경 변수는 개별 문의 부탁드립니다.
+- 프로젝트 루트에 `.env` 파일이 필요합니다. (DB, NextAuth, OAuth, S3, OpenAI, Firebase 등)
+- 환경 변수 값은 개별 문의 부탁드립니다.
 
 ### 4. 실행
 ```bash
 # 개발 서버 실행
-# bun 이용시
+# bun 이용시 (권장)
 bun run dev
 
 # npm 이용시
@@ -69,6 +72,9 @@ bun start
 # npm 이용시
 npm run build
 npm start
+
+# 단위 테스트 (Vitest)
+bun run test
 ```
 
 
@@ -76,7 +82,7 @@ npm start
 | <img src="https://avatars.githubusercontent.com/u/47844901?v=4" width="200" height="200"/> | <img src="https://avatars.githubusercontent.com/u/180416062?v=4" width="200" height="200"/> | <img src="https://avatars.githubusercontent.com/u/113508075?v=4" width="200" height="200"/> | <img src="https://avatars.githubusercontent.com/u/132253329?v=4" width="200" height="200"/> | <img src="https://avatars.githubusercontent.com/u/170381300?v=4" width="200" height="200"/> |
 |:---:|:---:|:---:|:---:|:---:|
 | **정승민**<br/>[@HarenKei](https://github.com/HarenKei) | **김강현**<br/>[@developer-kanghyun](https://github.com/developer-kanghyun) | **조현돈**<br/>[@chohyundon](https://github.com/chohyundon) | **김동우**<br/>[@devdongwoo](https://github.com/devdongwoo) | **유상현**<br/>[@YSangH](https://github.com/YSangH) |
-| 🟩 프로젝트 리딩<br/>🟦 Frontend (대시보드 및 라우팅 구조 정립)<br/>🟧 [Backend (클린 아키텍처 구현, 패턴 정립)](#프로젝트-아키텍처-소개-클린-아키텍처-적용)<br/>🟩 배포<br/>🟩 프레젠테이션 발표 | 🟧 Backend (루틴 CRUD 로직 및 API)<br/>🟩 PWA 기능 구현 (푸시 알림)<br/>🟦 Frontend (알림 페이지) | 🟩 UI/UX 디자인<br/>🟦 Frontend (활동 피드백 및 분석)<br/>🟧 Backend (GPT API 피드백 및 분석) | 🟦 Frontend (유저 프로필 페이지)<br/>🟧 Backend (유저 프로필 CRUD 로직 및 API) | 🟦 Frontend (회원가입 및 로그인)<br/>🟧 Backend (유저 인증/인가) |
+| 🟩 프로젝트 리딩<br/>🟦 Frontend (대시보드 및 라우팅 구조 정립)<br/>🟧 [Backend (클린 아키텍처 구현, 패턴 정립)](#프로젝트-아키텍처-소개-클린-아키텍처-적용)<br/>🟩 배포<br/>🟩 프레젠테이션 발표 | 🟧 Backend (루틴 CRUD 로직 및 API)<br/>🟩 PWA 기능 구현 (푸시 알림)<br/>🟦 Frontend (알림 페이지) | 🟩 UI/UX 디자인<br/>🟦 Frontend (활동 피드백 및 분석)<br/>🟧 Backend (GPT API 피드백 및 분석)<br/>🟩 **추가 개선** — Next.js 16 업그레이드, 온보딩·로그인 흐름, 라우트 평탄화, Supabase 전환, FCM 푸시 알림, Bun 통일 | 🟦 Frontend (유저 프로필 페이지)<br/>🟧 Backend (유저 프로필 CRUD 로직 및 API) | 🟦 Frontend (회원가입 및 로그인)<br/>🟧 Backend (유저 인증/인가) |
 
 ### 컨벤션
 - 커밋 메시지 컨벤션 (템플릿 및 commitlinting 적용)
@@ -124,6 +130,13 @@ npm start
 #### Runtime
 - **Bun**
   - 새로운 JavaScript 런타임을 경험하기 위해 사용하였습니다.
+  - 추가 개선 단계에서 패키지 매니저를 Bun으로 통일하였습니다.
+
+---
+
+#### Database
+- **Supabase (PostgreSQL)**
+  - 부트캠프 이후 Prisma에서 Supabase로 전환하여 호스팅·인증 연동을 단순화하였습니다.
 
 ---
 
@@ -143,7 +156,21 @@ npm start
 
 #### 인증 / 인가
 - **NextAuth**
-  - OAuth 기반 소셜 로그인 및 사용자 인증 관리에 사용했습니다.
+  - 이메일·비밀번호(Credentials) 및 Google OAuth 로그인을 지원합니다.
+  - JWT에 `onboardingCompleted`를 포함해 온보딩 완료 여부를 세션과 연동합니다.
+
+---
+
+#### Push Notification
+- **Firebase Cloud Messaging (FCM)**
+  - 브라우저 Web Push API 대비 크로스 플랫폼 안정성을 위해 FCM으로 전환하였습니다.
+  - 포그라운드(앱 사용 중)는 커스텀 토스트, 백그라운드(앱 종료)는 OS 알림으로 처리합니다.
+
+---
+
+#### Testing
+- **Vitest**
+  - 라우팅·인증 콜백 등 핵심 로직 단위 테스트에 사용합니다.
 
 ---
 
@@ -160,11 +187,21 @@ npm start
 ### 메인 시스템 소개
 <img width="3840" height="2160" alt="image" src="https://github.com/user-attachments/assets/342c19aa-1138-4665-bf10-3162ddd56818" />
 
+### 온보딩 / 라우팅
+- `proxy.ts`에서 경로별 접근 제어 및 리다이렉트를 처리합니다. (Next.js 16 proxy)
+- **로그인 사용자**: DB `users.onboarding_completed` + JWT로 온보딩 완료 여부를 관리합니다.
+- **게스트(비로그인)**: httpOnly 쿠키 `onboarding=done`으로 완료 상태를 저장하고 `/demo`로 이동합니다.
+- 로그인 사용자가 게스트 온보딩을 이미 마친 경우, proxy에서 DB 동기화 후 온보딩을 건너뜁니다.
+- 보호 경로: `/dashboard`, `/profile`, `/feedback`, `/follow`, `/search`, `/notifications`
+- 레거시 `/user/*` URL은 신규 flat 경로로 **308** 영구 리다이렉트합니다. (예: `/user/dashboard` → `/dashboard`)
+- 상세 흐름은 [`docs/onboarding-login-flow.md`](docs/onboarding-login-flow.md) 참고
+
 ### 회원가입 / 로그인
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/aa8e2b69-7ee0-44d3-9ba0-99067f97c8bd" />
 - Next-Auth 라이브러리를 활용하여 간단하고 간편하게 인증, 인가를 구현하였습니다.
 - bcrypt.js를 활용하여 사용자의 패스워드를 해싱하여 저장합니다.
-- OAuth를 활용해 카카오와 구글 두 가지 소셜 로그인 서비스를 구현하였습니다.
+- Google OAuth 소셜 로그인을 지원합니다.
+- 로그인 후 온보딩 완료 여부에 따라 `/dashboard` 또는 `/onboarding`으로 분기합니다.
 
 ### 메인 대시보드
   <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ebbbd882-2c4f-4e16-b9c2-ceb725773607" />
@@ -187,9 +224,31 @@ npm start
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7f817381-057d-4b9d-9f68-943a730f4f91" />
 - 개인화된 페이지와 다른 사용자의 유저 페이지의 권한 분기를 위한 Custom Hook을 구현하였습니다.
 
-### Next-PWA를 활용한 푸시 알림 (2025.08.31 시점 개발중)
+### FCM 푸시 알림
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/84a97cf4-98f1-49fc-b33f-1d34972c7177" />
+- Firebase Cloud Messaging(FCM) 기반 웹 푸시 알림을 구현하였습니다.
+- 서비스워커는 Next.js Route Handler(`/firebase-messaging-sw.js`)로 제공하여 Firebase 키를 env에서 안전하게 주입합니다.
+- 알림 허용 토글, FCM 토큰 DB 저장, iOS Safari 미지원 방어 로직을 포함합니다.
+- 상세 구현은 [`docs/fcm-push-notification.md`](docs/fcm-push-notification.md) 참고
 
+## 추가 개선 사항 (2025~2026)
+
+부트캠프 이후 [@chohyundon](https://github.com/chohyundon)이 진행한 주요 개선입니다.
+
+| 영역 | 내용 |
+|------|------|
+| **프레임워크** | Next.js 16 업그레이드, `middleware` → `proxy.ts` 라우팅 가드 전환 |
+| **온보딩·인증** | httpOnly 쿠키 기반 게스트 온보딩, DB/JWT 동기화, 로그인 후 리다이렉트 정리 |
+| **라우팅** | `/user` prefix 제거 및 flat 라우트 (`/dashboard`, `/profile` 등), 레거시 308 리다이렉트 |
+| **인프라** | Prisma → Supabase 전환, Bun 패키지 매니저 통일 |
+| **알림** | Web Push → FCM 전환, 포그라운드 커스텀 토스트 UI |
+| **품질** | Vitest 단위 테스트 추가, 피드백·대시보드 버그 수정 |
+
+관련 문서:
+- [`docs/onboarding-login-flow.md`](docs/onboarding-login-flow.md) — 온보딩·로그인 라우팅
+- [`docs/cookie-security-guide.md`](docs/cookie-security-guide.md) — 온보딩 쿠키 보안
+- [`docs/improvement-report.md`](docs/improvement-report.md) — 피드백·대시보드·온보딩 수정 내역
+- [`docs/fcm-push-notification.md`](docs/fcm-push-notification.md) — FCM 푸시 알림 구현
 
 ## 트러블 슈팅
 <img width="3840" height="2160" alt="image" src="https://github.com/user-attachments/assets/0be46033-f06b-4fdd-8c0c-91d0dd1b29ef" />
@@ -202,6 +261,7 @@ npm start
 계층형 클린 아키텍처를 적용하여 관심사를 분리하고, 각 계층별 의존성을 최소화하였습니다.<br/>
 이를 통해 개발 및 리팩토링 과정에서 문제가 발생한 계층을 명확하고 빠르게 판별하고 접근할 수 있었습니다.<br/>
 <br/>
+**라우팅 가드**는 루트의 `proxy.ts`에서 처리합니다. 인증·온보딩 완료 여부에 따라 보호 경로 접근을 제어합니다.<br/>
 <br/>
 ```text
 backend/
