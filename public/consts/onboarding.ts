@@ -1,4 +1,11 @@
-export const ONBOARDING_LIST = [
+export interface OnboardingStep {
+  id: number;
+  icon: string;
+  title: string;
+  description?: string;
+}
+
+export const ONBOARDING_LIST: OnboardingStep[] = [
   {
     id: 1,
     icon: '/icons/firstOnboarding.png',

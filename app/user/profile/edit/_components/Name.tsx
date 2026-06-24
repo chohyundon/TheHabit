@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { updateUser } from '@/libs/api/users.api';
 import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
 
@@ -36,11 +36,7 @@ export const NameComponent = () => {
     }
   };
 
-  useEffect(() => {
-    if (userInfo?.username) {
-      setName(userInfo.username);
-    }
-  }, [userInfo]);
+  const displayName = userInfo?.username ?? getName;
 
   return (
     <div className='flex flex-col w-[180px] relative '>
@@ -70,7 +66,7 @@ export const NameComponent = () => {
       ) : (
         <>
           <span className='font-normal text-[#222] max-sm:pt-[60px] border-b-1 mb-3 border-[#ebebeb] w-full whitespace-nowrap overflow-hidden text-ellipsis max-sm:w-[130px]'>
-            {getName}
+            {displayName}
           </span>
           <button
             className='absolute w-[50px] h-[34px] max-sm:top-[50px] top-1 right-[-50] cursor-pointer text-[12px] rounded-lg border-[#d3d3d3] border-1  max-sm:right-[0]'

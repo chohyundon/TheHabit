@@ -20,7 +20,7 @@ The `.env` file is required for API keys (database, auth providers, S3, OpenAI, 
 
 ## Architecture Overview
 
-This is a **full-stack Next.js 15 application** for a habit-tracking platform ("The:Habit") that provides challenges based on habit formation science (21-day and 66-day challenges).
+This is a **full-stack Next.js 16 application** for a habit-tracking platform ("The:Habit") that provides challenges based on habit formation science (21-day and 66-day challenges).
 
 ### High-Level Structure
 
@@ -45,7 +45,7 @@ TheHabit/
 │   ├── stores/           # Zustand global state (modals, etc.)
 │   └── types/            # Shared TypeScript types
 ├── prisma/               # Database schema and migrations
-└── middleware.ts         # Next.js middleware (routing guards)
+└── proxy.ts              # Next.js proxy (routing guards)
 ```
 
 ### Backend Modules (Clean Architecture)
@@ -72,7 +72,7 @@ Example: For creating a challenge:
 
 - **App Router**: `/app` directory contains all pages and API routes
 - **API Routes**: Implemented in `/app/api/[feature]/` as Next.js Route Handlers
-- **Protected Routes**: Middleware in `middleware.ts` enforces authentication (checks `next-auth` session cookies)
+- **Protected Routes**: Proxy in `proxy.ts` enforces authentication (checks `next-auth` session cookies)
 - **Routing Guards**:
   - Unauthenticated users redirected to `/onboarding`
   - Onboarding-complete users (cookie `onboarding=done`) can't revisit onboarding
@@ -86,7 +86,7 @@ Example: For creating a challenge:
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | **Runtime** | Bun (also Yarn/npm compatible) | JavaScript runtime |
-| **Framework** | Next.js 15 | Full-stack React framework with SSR |
+| **Framework** | Next.js 16 | Full-stack React framework with SSR |
 | **Frontend** | React 19, TypeScript, Tailwind CSS, Antd | UI components & styling |
 | **State** | Zustand | Global UI state (modals, etc.) |
 | **Data Fetching** | TanStack Query + Axios | Server state & caching (in `libs/api/`) |
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
 
 ### Authentication & Authorization
 
-- **Protected Pages**: Use middleware (checks `next-auth` session cookie)
+- **Protected Pages**: Use proxy (`proxy.ts`) (checks `next-auth` session cookie)
 - **Protected API Routes**: Extract session in Route Handler using `getServerSession()`
 - **Custom Hooks**: Use permission checks in components (e.g., `useIsOwnProfile()` for ownership verification)
 
@@ -222,4 +222,4 @@ TypeScript configured with `@/*` → root directory (e.g., `@/backend/challenges
 
 - PWA notifications are **disabled** — enable by setting `disable: false` in `next.config.ts` and testing service worker
 - Recent fix: VAPID setup deferred to avoid build failures without env vars
-- Onboarding middleware prevents re-entry after completion; redirects to `/user/dashboard` or demo
+- Onboarding proxy prevents re-entry after completion; redirects to `/user/dashboard` or demo

@@ -8,7 +8,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import GoogleProvider from 'next-auth/providers/google';
 import { GoogleLoginUsecase } from '@/backend/auths/application/usecases/GoogleLoginUsecase';
 import { LoginResponseDto } from '@/backend/auths/application/dtos/LoginResponseDto';
-import { getSupabaseAdmin } from '@/public/utils/supabase/server';
+import { fetchOnboardingCompleted } from '@/libs/onboarding/onboarding.server';
 
 interface SocialUserInfo {
   email: string;
@@ -57,27 +57,6 @@ const buildTokenFromUser = async (token: JWT, user: User): Promise<JWT> => {
     onboardingCompleted,
   };
 };
-
-async function fetchOnboardingCompleted(userId: string): Promise<boolean> {
-  try {
-    const supabase = getSupabaseAdmin();
-    const { data, error } = await supabase
-      .from('users')
-      .select('onboarding_completed')
-      .eq('id', userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error('온보딩 상태 조회 실패:', error);
-      return false;
-    }
-
-    return data?.onboarding_completed === true;
-  } catch (error) {
-    console.error('Supabase 온보딩 상태 조회 중 오류:', error);
-    return false;
-  }
-}
 
 const providers = [
   CredentialsProvider({

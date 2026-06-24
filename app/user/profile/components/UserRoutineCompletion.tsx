@@ -58,7 +58,10 @@ const UserRoutineCompletion = ({
   }, [nickname, routineCompletionId, userInfo?.nickname]);
 
   useEffect(() => {
-    getReviewEmoji();
+    const timer = setTimeout(() => {
+      void getReviewEmoji();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [getReviewEmoji]);
 
   useEffect(() => {

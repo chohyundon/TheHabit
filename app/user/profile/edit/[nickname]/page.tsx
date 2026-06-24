@@ -19,7 +19,8 @@ const UserProfileEditPage = () => {
   const router = useRouter();
   const { status } = useSession();
   const { userInfo, update } = useGetUserInfo();
-  const [profilePreview, setProfilePreview] = useState<string | null>(userInfo?.profileImg || '');
+  const [profilePreview, setProfilePreview] = useState<string | null>(null);
+  const displayedProfileImg = profilePreview ?? userInfo?.profileImg ?? null;
   const [open, setOpen] = useState<boolean>(false);
 
   const { handleImageClick, fileInputRef } = useUploadProfile();
@@ -78,12 +79,6 @@ const UserProfileEditPage = () => {
     }
   }, [status, router]);
 
-  useEffect(() => {
-    if (userInfo?.profileImg) {
-      setProfilePreview(userInfo.profileImg);
-    }
-  }, [userInfo]);
-
   return (
     <main>
       <section id='logo_wrapper' className='positive pt-[10px]'>
@@ -107,7 +102,7 @@ const UserProfileEditPage = () => {
           >
             <div className='relative w-[190px] max-sm:w-[220px] h-30 rounded-full bg-[#F5F5F5] bottom-[40px]'>
               <ProfileImage
-                imageSrc={profilePreview || null}
+                imageSrc={displayedProfileImg}
                 className='w-full h-full object-cover'
                 wrapperWidth={30}
                 wrapperHeight={30}

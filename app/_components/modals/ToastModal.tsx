@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useModalAnimation } from '@/libs/hooks/useModalAnimation';
 
 interface ToastModalProps {
   children: React.ReactNode;
@@ -9,25 +10,7 @@ interface ToastModalProps {
 }
 
 const ToastModal: React.FC<ToastModalProps> = ({ children, isOpen = false, onClose }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      // 약간의 지연 후 애니메이션 시작
-      const timer = setTimeout(() => {
-        setIsAnimating(true);
-      }, 10);
-      return () => clearTimeout(timer);
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, 300); // 애니메이션 완료 후 숨김
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+  const { isVisible, isAnimating } = useModalAnimation(isOpen);
 
   if (!isVisible) return null;
 

@@ -35,12 +35,19 @@ export const UserPage = ({ userNickname }: { userNickname: string }) => {
   const editNickname = getSessionNickname || getUserData.nickname || userNickname;
 
   const fetchData = useCallback(async () => {
-    setIsLoading(true);
     const response = await getUserChallengeAndRoutineAndFollowAndCompletion(userNickname || '');
     if (response?.data) {
-      setUserData({ ...response.data, nickname: decodeURIComponent(response.data.nickname) });
-      setIsLoading(false);
+      const nextUserData = {
+        ...response.data,
+        nickname: decodeURIComponent(response.data.nickname),
+      };
+      setUserData(nextUserData);
+      if (nextUserData.challenges.length > 0) {
+        setSelectedChallengeId(prev => prev ?? nextUserData.challenges[0].id);
+        setSelectedChallengeName(prev => prev || nextUserData.challenges[0].name);
+      }
     }
+    setIsLoading(false);
   }, [userNickname]);
 
   const shouldFetchData = useMemo(() => {
@@ -48,16 +55,12 @@ export const UserPage = ({ userNickname }: { userNickname: string }) => {
   }, [userNickname, getUserData.challenges.length]);
 
   useEffect(() => {
-    if (shouldFetchData) fetchData();
+    if (!shouldFetchData) return;
+    const timer = setTimeout(() => {
+      void fetchData();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [shouldFetchData, fetchData]);
-
-  useEffect(() => {
-    if (getUserData.challenges.length > 0 && getSelectedChallengeId === null) {
-      const firstChallenge = getUserData.challenges[0];
-      setSelectedChallengeId(firstChallenge.id);
-      setSelectedChallengeName(firstChallenge.name);
-    }
-  }, [getUserData, getSelectedChallengeId, setSelectedChallengeId, setSelectedChallengeName]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

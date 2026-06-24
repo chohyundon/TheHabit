@@ -2,7 +2,7 @@
 
 import WeeklySlide from '@/app/_components/weekly-slides/WeeklySlide';
 import { getKoreanDateFromDate } from '@/public/utils/dateUtils';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Radio, RadioChangeEvent } from 'antd';
 import AddChallengeButton from './AddChallengeButton';
 import '@ant-design/v5-patch-for-react-19';
@@ -21,20 +21,20 @@ import { Toast } from '@/app/_components/toasts/Toast';
 const ChallengeListSection: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSort, setSelectedSort] = useState<string>('all');
-  const [hasError, setHasError] = useState(false);
   const { openModal } = useModalStore();
   const params = useParams();
   const nickname = params.nickname as string;
   const { data: profileUser } = useGetUserByNickname(nickname);
   const { isOwnProfile: isOwner } = useUserPage(nickname, profileUser?.data?.id);
   const { data: dashboard, error, isLoading, refetch } = useGetDashboardByNickname(nickname);
+  const hasError = !!error;
 
-  // 에러 처리
   useEffect(() => {
-    if (error) {
-      setHasError(true);
+    if (!error) return;
+    const timer = setTimeout(() => {
       Toast.error('챌린지 목록을 불러오는 중 문제가 발생했습니다');
-    }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [error]);
 
   // 선택된 날짜가 챌린지 기간 내에 있는지 확인하는 함수
@@ -147,7 +147,9 @@ const ChallengeListSection: React.FC = () => {
         <div className='flex gap-3'>
           <button
             onClick={() => {
-              setHasError(false);
+              if (error) {
+                Toast.error('챌린지 목록을 불러오는 중 문제가 발생했습니다');
+              }
               refetch();
             }}
             className='px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium'

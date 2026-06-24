@@ -1,9 +1,7 @@
 import { firebaseApp } from '@/firebase';
-import { getMessaging, getToken, isSupported, type Messaging } from 'firebase/messaging';
+import { getMessaging, getToken } from 'firebase/messaging';
 
 const FCM_SW_PATH = '/firebase-messaging-sw.js';
-
-let messagingInstance: Messaging | null = null;
 
 // Service Worker 등록
 const getServiceWorkerRegistration = async (): Promise<ServiceWorkerRegistration> => {

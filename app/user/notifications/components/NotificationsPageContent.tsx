@@ -50,11 +50,11 @@ export const NotificationsPageContent = () => {
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
   const [pushEnabled, setPushEnabled] = useState(false);
   const [pushError, setPushError] = useState<string | null>(null);
-  const [permission, setPermission] = useState<BrowserPermission>('default');
+  const [permission, setPermission] = useState<BrowserPermission>(() =>
+    typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
+  );
 
   useEffect(() => {
-    setPermission(Notification.permission);
-
     const syncPushState = async () => {
       try {
         const { success, data } = await getFcmTokenStatus();

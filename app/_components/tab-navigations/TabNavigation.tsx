@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { tabItem } from '@/public/consts/tabItem';
 import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
 import { useRouter } from 'next/navigation';
@@ -11,14 +11,14 @@ import Image from 'next/image';
 export const TabNavigation = () => {
   const router = useRouter();
   const [isHover, setIsHover] = useState<string>('');
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const { userInfo } = useGetUserInfo();
   const [isOpen, setIsOpen] = useState(false);
   const nickname = userInfo?.nickname;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const isMouseHover = (name: string) => {
     setIsHover(name);

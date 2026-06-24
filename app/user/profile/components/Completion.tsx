@@ -39,9 +39,10 @@ export const CompletionComponent = ({
   );
 
   const rootRef = useRef<HTMLUListElement>(null);
+  const [scrollRoot, setScrollRoot] = useState<HTMLUListElement | null>(null);
 
   const { ref, inView } = useInView({
-    root: rootRef.current,
+    root: scrollRoot,
     threshold: 0,
   });
 
@@ -102,7 +103,10 @@ export const CompletionComponent = ({
     contentToRender = (
       <ul
         className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-1 overflow-y-scroll scroll-smooth max-h-[450px]'
-        ref={rootRef}
+        ref={node => {
+          rootRef.current = node;
+          setScrollRoot(node);
+        }}
       >
         {allCompletions.map((item, idx: number) => {
           const isLastItem = idx === allCompletions.length - 1;

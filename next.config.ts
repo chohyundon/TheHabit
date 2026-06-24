@@ -22,8 +22,13 @@ const nextConfig: NextConfig = {
     ],
   }),
   images: {
-    domains: ['images.unsplash.com', 'k.kakaocdn.net', 'lh3.googleusercontent.com', 'img1.kakaocdn.net', 't1.kakaocdn.net',],
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
       {
         protocol: 'https',
         hostname: 'habit-img.s3.ap-northeast-2.amazonaws.com',

@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import { ONBOARDING_LIST } from '@/public/consts/onboarding';
+import { ToastContainer } from 'react-toastify';
+import Toast from '@/app/_components/toasts/Toast';
 
 export const OnBoardingStepComponent = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -24,13 +26,16 @@ export const OnBoardingStepComponent = () => {
     try {
       const res = await fetch('/api/onboarding/complete', { method: 'POST' });
       if (!res.ok) throw new Error('온보딩 완료 처리에 실패했습니다.');
-      const data = (await res.json()) as { redirectTo?: string };
+      const data = (await res.json()) as { redirectTo?: string; success?: boolean; error?: string };
+      if (data.error) {
+        Toast.error(data.error);
+      }
 
       if (session?.user) {
         await update();
       }
 
-      router.replace(data.redirectTo ?? '/demo');
+      router.replace(data.redirectTo ?? (session?.user ? '/user/dashboard' : '/demo'));
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);
@@ -39,6 +44,7 @@ export const OnBoardingStepComponent = () => {
 
   return (
     <>
+      <ToastContainer />
       {/* 페이지 인디케이터 */}
       <div className='flex space-x-2 mt-4 border-b-2 border-gray-300 w-full'>
         {ONBOARDING_LIST.map((item, index) => (
