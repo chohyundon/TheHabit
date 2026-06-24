@@ -27,14 +27,14 @@ messaging.onBackgroundMessage(payload => {
   return self.registration.showNotification(title, {
     body,
     icon: '/images/icons/manifest-192x192.png',
-    data: { ...payload.data, url: payload.data?.url ?? '/user/notifications' },
+    data: { ...payload.data, url: payload.data?.url ?? '/notifications' },
   });
 });
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
 
-  const url = event.notification.data?.url ?? '/user/notifications';
+  const url = event.notification.data?.url ?? '/notifications';
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {

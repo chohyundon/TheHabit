@@ -10,7 +10,7 @@ export const FeedBackHeader = () => {
   const username = session?.user?.name;
   const pathname = usePathname();
 
-  const isFeedbackListPage = nickname ? pathname === `/user/feedback/${nickname}` : false;
+  const isFeedbackListPage = nickname ? pathname === `/feedback/${nickname}` : false;
 
   if (!isFeedbackListPage) {
     return null;

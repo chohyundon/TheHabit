@@ -9,7 +9,7 @@ export const BackComponent = ({
 }) => {
   const router = useRouter();
   //팔로우일때는 각 다른 url로 이동하기때문에 push로 해줘야함
-  const handlergoBack = () => (nickname ? router.push(`/user/profile/${nickname}`) : router.back());
+  const handlergoBack = () => (nickname ? router.push(`/profile/${nickname}`) : router.back());
 
   return (
     <p onClick={handlergoBack} className={className}>

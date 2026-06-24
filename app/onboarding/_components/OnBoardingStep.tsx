@@ -35,7 +35,7 @@ export const OnBoardingStepComponent = () => {
         await update();
       }
 
-      router.replace(data.redirectTo ?? (session?.user ? '/user/dashboard' : '/demo'));
+      router.replace(data.redirectTo ?? (session?.user ? '/dashboard' : '/demo'));
     } catch (error) {
       console.error(error);
       setIsSubmitting(false);

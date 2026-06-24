@@ -76,7 +76,7 @@ Example: For creating a challenge:
 - **Routing Guards**:
   - Unauthenticated users redirected to `/onboarding`
   - Onboarding-complete users (cookie `onboarding=done`) can't revisit onboarding
-  - Authenticated users accessing `/` redirect to `/user/dashboard`
+  - Authenticated users accessing `/` redirect to `/dashboard`
 - **State Management**:
   - Global UI state (modals, etc.) → **Zustand** (`libs/stores/`)
   - Server state (routines, challenges, etc.) → **TanStack Query** (via `libs/api/`)
@@ -222,4 +222,4 @@ TypeScript configured with `@/*` → root directory (e.g., `@/backend/challenges
 
 - PWA notifications are **disabled** — enable by setting `disable: false` in `next.config.ts` and testing service worker
 - Recent fix: VAPID setup deferred to avoid build failures without env vars
-- Onboarding proxy prevents re-entry after completion; redirects to `/user/dashboard` or demo
+- Onboarding proxy prevents re-entry after completion; redirects to `/dashboard` or demo

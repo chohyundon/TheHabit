@@ -5,9 +5,16 @@ import {
   syncGuestOnboardingToDb,
 } from '@/libs/onboarding/onboarding.server';
 import { ONBOARDING_COOKIE_NAME, ONBOARDING_COOKIE_VALUE } from '@/public/consts/onboardingConsts';
+import { isProtectedRoute } from '@/public/consts/protectedRoutes';
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // 구 /user/* URL → 신규 경로로 영구 리다이렉트
+  if (pathname === '/user' || pathname.startsWith('/user/')) {
+    const newPath = pathname === '/user' ? '/dashboard' : pathname.replace(/^\/user/, '');
+    return NextResponse.redirect(new URL(newPath, req.url), 308);
+  }
 
   const token = await getToken({
     req,
@@ -41,10 +48,10 @@ export async function proxy(req: NextRequest) {
 
   // 로그인 + 온보딩 완료 사용자는 온보딩 페이지 접근 불가
   if (hasCompletedOnboarding && isOnboardingPath && isLoggedIn) {
-    return respond(NextResponse.redirect(new URL('/user/dashboard', req.url)));
+    return respond(NextResponse.redirect(new URL('/dashboard', req.url)));
   }
 
-  if (pathname.startsWith('/user')) {
+  if (isProtectedRoute(pathname)) {
     if (!isLoggedIn) {
       return respond(NextResponse.redirect(new URL('/login', req.url)));
     }
@@ -56,7 +63,7 @@ export async function proxy(req: NextRequest) {
 
   if (pathname === '/') {
     if (isLoggedIn && hasCompletedOnboarding) {
-      return respond(NextResponse.redirect(new URL('/user/dashboard', req.url)));
+      return respond(NextResponse.redirect(new URL('/dashboard', req.url)));
     }
 
     if (!isLoggedIn && hasGuestOnboardingCookie) {
@@ -68,7 +75,7 @@ export async function proxy(req: NextRequest) {
 
   if (pathname === '/onboarding') {
     if (isLoggedIn && hasCompletedOnboarding) {
-      return respond(NextResponse.redirect(new URL('/user/dashboard', req.url)));
+      return respond(NextResponse.redirect(new URL('/dashboard', req.url)));
     }
 
     if (!isLoggedIn && hasGuestOnboardingCookie) {
@@ -78,7 +85,7 @@ export async function proxy(req: NextRequest) {
 
   if (pathname === '/login') {
     if (isLoggedIn) {
-      const dest = hasCompletedOnboarding ? '/user/dashboard' : '/onboarding';
+      const dest = hasCompletedOnboarding ? '/dashboard' : '/onboarding';
       return respond(NextResponse.redirect(new URL(dest, req.url)));
     }
   }
@@ -87,5 +94,16 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/user/:path*', '/onboarding/:path*', '/login'],
+  matcher: [
+    '/',
+    '/login',
+    '/onboarding/:path*',
+    '/user/:path*',
+    '/dashboard/:path*',
+    '/profile/:path*',
+    '/feedback/:path*',
+    '/follow/:path*',
+    '/search/:path*',
+    '/notifications/:path*',
+  ],
 };

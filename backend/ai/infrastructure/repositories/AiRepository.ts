@@ -1,6 +1,6 @@
 import { AiEntity } from '@/backend/ai/domain/entities/AiEntity';
 import { IAiRepository } from '@/backend/ai/domain/repositories/IAiRepository';
-import { GeminiProvider, OpenAIProvider } from '@/app/user/feedback/_components/AiProvider';
+import { GeminiProvider, OpenAIProvider } from '@/app/feedback/_components/AiProvider';
 
 export class AiRepository implements IAiRepository {
   constructor(private readonly provider: GeminiProvider | OpenAIProvider) {}

@@ -122,7 +122,7 @@ const ForegroundPushToast = ({
 export const showForegroundPushToast = (payload: MessagePayload) => {
   const title = payload.notification?.title ?? payload.data?.title ?? 'TheHabit';
   const body = payload.notification?.body ?? payload.data?.body ?? '새 알림이 도착했습니다.';
-  const redirectUrl = payload.data?.url ?? '/user/notifications';
+  const redirectUrl = payload.data?.url ?? '/notifications';
   const type = resolvePushType(payload.data?.type);
 
   toast(

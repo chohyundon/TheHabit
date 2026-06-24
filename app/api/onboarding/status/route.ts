@@ -25,6 +25,6 @@ export async function GET() {
   const done = data?.onboarding_completed === true;
   return NextResponse.json({
     done,
-    redirectTo: done ? '/user/dashboard' : null,
+    redirectTo: done ? '/dashboard' : null,
   });
 }

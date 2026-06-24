@@ -1,11 +1,14 @@
-import { NotificationsPageContent } from './components/NotificationsPageContent';
+'use client';
 import { Suspense } from 'react';
+import { FollowPageContent } from '@/app/follow/components/FollowPageContent';
 import { LoadingSpinner } from '@/app/_components/loading/LoadingSpinner';
 
-export default function NotificationsPage() {
+const FollowPage = () => {
   return (
     <Suspense fallback={<LoadingSpinner />}>
-      <NotificationsPageContent />
+      <FollowPageContent />
     </Suspense>
   );
-}
+};
+
+export default FollowPage;
