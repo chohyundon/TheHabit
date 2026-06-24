@@ -29,7 +29,12 @@ TheHabit/
 ├── app/                    # Next.js app router (frontend pages & routes)
 │   ├── api/               # API endpoints (Route Handlers)
 │   ├── _components/       # Reusable React components
-│   ├── user/              # Authenticated user pages (dashboard, profile, etc.)
+│   ├── dashboard/         # Authenticated dashboard
+│   ├── profile/           # User profile pages
+│   ├── feedback/          # Feedback pages
+│   ├── follow/            # Follow list
+│   ├── search/            # User search
+│   ├── notifications/     # Notifications
 │   ├── login/             # Authentication flows
 │   ├── onboarding/        # Onboarding flow
 │   └── demo/              # Demo page (public)
@@ -72,7 +77,7 @@ Example: For creating a challenge:
 
 - **App Router**: `/app` directory contains all pages and API routes
 - **API Routes**: Implemented in `/app/api/[feature]/` as Next.js Route Handlers
-- **Protected Routes**: Proxy in `proxy.ts` enforces authentication (checks `next-auth` session cookies)
+- **Protected Routes**: Proxy in `proxy.ts` enforces authentication on `/dashboard`, `/profile`, `/feedback`, `/follow`, `/search`, `/notifications` (see `public/consts/protectedRoutes.ts`). Legacy `/user/*` URLs redirect with 308.
 - **Routing Guards**:
   - Unauthenticated users redirected to `/onboarding`
   - Onboarding-complete users (cookie `onboarding=done`) can't revisit onboarding

@@ -482,7 +482,7 @@ export default function middleware(req: NextRequest) {
 
   // ✅ HttpOnly 쿠키는 서버에서 자동으로 접근 가능
   if (onboarding === 'done' && isOnboardingPath) {
-    return NextResponse.redirect(new URL(token ? '/user/dashboard' : '/demo', req.url));
+    return NextResponse.redirect(new URL(token ? '/dashboard' : '/demo', req.url));
   }
 
   if (pathname === '/' && !isOnboardingPath) {

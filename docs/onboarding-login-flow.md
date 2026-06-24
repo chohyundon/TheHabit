@@ -8,7 +8,7 @@ TheHabit 앱의 온보딩 완료 상태 관리 및 로그인 후 리다이렉트
 
 | 사용자 유형 | 완료 상태 저장 위치 | 완료 후 이동 |
 |------------|-------------------|-------------|
-| 로그인 사용자 | DB `users.onboarding_completed` + JWT `onboardingCompleted` | `/user/dashboard` |
+| 로그인 사용자 | DB `users.onboarding_completed` + JWT `onboardingCompleted` | `/dashboard` |
 | 비로그인(게스트) | httpOnly 쿠키 `onboarding=done` | `/demo` |
 
 로그인 사용자가 게스트 온보딩을 이미 마친 경우, 쿠키를 DB/JWT에 동기화한 뒤 온보딩을 다시 보여주지 않습니다.
@@ -56,14 +56,15 @@ const hasCompletedOnboarding =
 
 | 경로 | 조건 | 리다이렉트 |
 |------|------|-----------|
-| `/user/*` | 미로그인 | `/login` |
-| `/user/*` | 로그인 + 미완료 | `/onboarding` |
-| `/user/*` | 로그인 + 완료 | 통과 |
-| `/onboarding` | 로그인 + 완료 | `/user/dashboard` |
+| `/dashboard`, `/profile`, `/feedback`, `/follow`, `/search`, `/notifications` (+ 하위) | 미로그인 | `/login` |
+| 위 보호 경로 | 로그인 + 미완료 | `/onboarding` |
+| 위 보호 경로 | 로그인 + 완료 | 통과 |
+| `/user/*` (레거시) | — | 신규 flat 경로로 **308** 리다이렉트 (예: `/user/dashboard` → `/dashboard`) |
+| `/onboarding` | 로그인 + 완료 | `/dashboard` |
 | `/onboarding` | 비로그인 + 게스트 쿠키 | `/demo` |
-| `/login` | 로그인 + 완료 | `/user/dashboard` |
+| `/login` | 로그인 + 완료 | `/dashboard` |
 | `/login` | 로그인 + 미완료 | `/onboarding` |
-| `/` | 로그인 + 완료 | `/user/dashboard` |
+| `/` | 로그인 + 완료 | `/dashboard` |
 | `/` | 비로그인 + 게스트 쿠키 | `/demo` |
 | `/` | 그 외 | `/onboarding` |
 
@@ -86,7 +87,7 @@ const hasCompletedOnboarding =
 #### 로그인 사용자
 
 1. Supabase `users.onboarding_completed = true` 저장
-2. `{ success: true, redirectTo: '/user/dashboard' }` 반환
+2. `{ success: true, redirectTo: '/dashboard' }` 반환
 
 #### 비로그인 사용자
 
@@ -134,7 +135,7 @@ const hasCompletedOnboarding =
 
 | 경로 | 처리 주체 |
 |------|----------|
-| 이메일/Google 로그인 후 | **proxy** — `/user/dashboard` 등 보호 경로 진입 시 자동 sync |
+| 이메일/Google 로그인 후 | **proxy** — `/dashboard` 등 보호 경로 진입 시 자동 sync |
 | 수동 호출 | `POST /api/onboarding/sync-guest` (선택) |
 
 > 전역 `GuestOnboardingSync` 클라이언트 컴포넌트는 제거했습니다. 앱 전체에 `'use client'` + `useEffect`를 두지 않고, **proxy(서버)** 에서 sync·쿠키 삭제·라우팅을 처리합니다.
@@ -149,7 +150,7 @@ const hasCompletedOnboarding =
 로그인 (onboardingCompleted=false)
   → proxy: /onboarding
   → "시작하기" → POST /api/onboarding/complete
-  → DB 저장 + redirectTo: /user/dashboard
+  → DB 저장 + redirectTo: /dashboard
   → dashboard
 ```
 
@@ -168,7 +169,7 @@ const hasCompletedOnboarding =
 온보딩 완료 (쿠키 보유)
   → demo
   → 로그인
-  → proxy: hasCompletedOnboarding=true → /user/dashboard (온보딩 스킵)
+  → proxy: hasCompletedOnboarding=true → /dashboard (온보딩 스킵)
   → proxy: DB sync + 쿠키 삭제
   → 이후 요청: DB 조회로 완료 상태 유지 (JWT 갱신 전에도)
 ```
@@ -179,7 +180,7 @@ flowchart TD
     B --> C[demo]
     C --> D[로그인]
     D --> E["proxy: hasCompletedOnboarding=true"]
-    E --> F[/user/dashboard]
+    E --> F[/dashboard]
     D --> G["proxy: sync DB + 쿠키 삭제"]
     G --> H["DB onboarding_completed=true"]
 ```
@@ -191,7 +192,7 @@ flowchart TD
 ### `OnBoardingStep.tsx`
 
 ```ts
-router.replace(data.redirectTo ?? (session?.user ? '/user/dashboard' : '/demo'));
+router.replace(data.redirectTo ?? (session?.user ? '/dashboard' : '/demo'));
 ```
 
 API `redirectTo` 우선, 없을 때만 세션 기준 fallback.
@@ -199,7 +200,7 @@ API `redirectTo` 우선, 없을 때만 세션 기준 fallback.
 ### `LoginForm.tsx`
 
 ```ts
-router.replace('/user/dashboard');
+router.replace('/dashboard');
 ```
 
 로그인 성공 후 dashboard로 이동합니다. 게스트 쿠키 sync·삭제는 **proxy**가 처리합니다.
@@ -222,5 +223,6 @@ router.replace('/user/dashboard');
 ## 주의사항
 
 - `LoginForm`에서 `cookies()` from `next/headers` 사용 불가 (`'use client'` + httpOnly)
-- Google 로그인은 `SocialLogin`의 `callbackUrl: '/user/dashboard'` — 진입 시 proxy가 sync 처리
-- proxy matcher: `'/', '/user/:path*', '/onboarding/:path*', '/login'` — `/demo`는 proxy 대상 아님
+- Google 로그인은 `SocialLogin`의 `callbackUrl: '/dashboard'` — 진입 시 proxy가 sync 처리
+- proxy matcher: `'/', '/login', '/onboarding/:path*', `/user/:path*`(레거시 308), `/dashboard/:path*`, `/profile/:path*`, `/feedback/:path*`, `/follow/:path*`, `/search/:path*`, `/notifications/:path*` — `/demo`는 proxy 대상 아님
+- 보호 경로 목록: `public/consts/protectedRoutes.ts`

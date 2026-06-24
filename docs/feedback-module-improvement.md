@@ -10,7 +10,7 @@
 
 | 구분 | 경로 / 파일 |
 |------|-------------|
-| **피드백 페이지** | `app/user/feedback/**` |
+| **피드백 페이지** | `app/feedback/**` |
 | **데모(시안)** | `app/demo/feedback/**` |
 | **피드백 훅** | `libs/hooks/feedback-hooks/**` |
 | **피드백 API 클라이언트** | `libs/api/feedback.api.ts`, `libs/api/ai.api.ts` |
@@ -48,10 +48,10 @@
 | TanStack Query | `isLoading` 수동 분기, `isError` 미처리 | `FeedBackList.tsx`, `FeedBackById.tsx` |
 | TanStack Query | `queryKey` 불일치 (`['feedBack', id]` vs `['feedBack', id, nickname]`) | `useGetFeedBackById.ts`, `useGenerateFeedback.ts` |
 | TanStack Query | mutation 훅 2개 (`useGenerateFeedback`, `useCreateFeedBack`) 역할 중복 | `libs/hooks/feedback-hooks/**` |
-| Suspense | 피드백 모듈 전체 미적용 (다른 페이지만 사용) | `app/user/follow/page.tsx` 참고 |
+| Suspense | 피드백 모듈 전체 미적용 (다른 페이지만 사용) | `app/follow/page.tsx` 참고 |
 | Error Boundary | `error.tsx` 없음, catch 후 `console.error`만 | `FeedBackDetail.tsx`, `FeedBackPostData.ts` |
 | 예측 가능성 | `FeedBackPostData` 반환 타입 혼재 (`string \| undefined \| [] \| errorMessage`) | `FeedBackPostData.ts` |
-| 응집도 | `AiProvider`가 `app/user/feedback/_components`에 있으나 BE에서 import | `AiProvider.ts`, `AiRepository.ts` |
+| 응집도 | `AiProvider`가 `app/feedback/_components`에 있으나 BE에서 import | `AiProvider.ts`, `AiRepository.ts` |
 | 응집도 | `FeedBackPostData`가 FE 컴포넌트 폴더에 있으나 GPT+DB 오케스트레이션 | `FeedBackPostData.ts` |
 | 응집도 | `demo/feedback` ↔ `user/feedback` UI·탭 구조 중복 | `app/demo/feedback/**` |
 | 디자인 시스템 | Ant Design + Recharts + Tailwind + 인라인 `style` 혼용 | `FeedBackCategoryProgress.tsx`, `Swiper.tsx` |
@@ -159,7 +159,7 @@ return useSuspenseQuery({ ... });
 
 ### 5-1. 페이지 단위 Suspense (1단계 — 추천)
 
-**파일**: `app/user/feedback/[nickname]/page.tsx`
+**파일**: `app/feedback/[nickname]/page.tsx`
 
 ```tsx
 import { Suspense } from 'react';
@@ -219,8 +219,8 @@ GPT 생성은 사용자 액션(mutation)이라 Suspense 부적합.
 **신규 파일**
 
 ```
-app/user/feedback/[nickname]/error.tsx
-app/user/feedback/[nickname]/[id]/error.tsx
+app/feedback/[nickname]/error.tsx
+app/feedback/[nickname]/[id]/error.tsx
 ```
 
 ```tsx
@@ -262,7 +262,7 @@ API 실패는 Query `isError` UI로 처리 (4-3).
 
 ### 6-3. 공통 Error Fallback 컴포넌트
 
-**신규**: `app/user/feedback/_components/FeedBackErrorFallback.tsx`
+**신규**: `app/feedback/_components/FeedBackErrorFallback.tsx`
 
 - props: `title`, `message`, `onRetry`
 - 통계 탭 · 상세 페이지에서 재사용 → **결합도↓**
@@ -322,7 +322,7 @@ POST /api/feedback/[nickname]/generate
 
 ### 7-2. AiProvider 위치 이동
 
-**현재**: `app/user/feedback/_components/AiProvider.ts`  
+**현재**: `app/feedback/_components/AiProvider.ts`  
 **개선**: `backend/ai/infrastructure/providers/` 로 이동
 
 - BE → FE `_components` import 제거 (**응집도↑, 결합도↓**)
@@ -353,7 +353,7 @@ POST /api/feedback/[nickname]/generate
 
 ### 8-1. 피드백 모듈 디자인 토큰 (최소 범위)
 
-**신규**: `app/user/feedback/_styles/feedback.tokens.ts` (또는 `public/consts/feedbackTokens.ts`)
+**신규**: `app/feedback/_styles/feedback.tokens.ts` (또는 `public/consts/feedbackTokens.ts`)
 
 ```ts
 export const FEEDBACK_LAYOUT = {
@@ -405,7 +405,7 @@ export const FEEDBACK_TAB = {
 
 ### 8-4. demo → user 통합 (응집도)
 
-**문제**: `app/demo/feedback`과 `app/user/feedback` 탭·레이아웃 중복
+**문제**: `app/demo/feedback`과 `app/feedback` 탭·레이아웃 중복
 
 **개선 옵션**
 - demo는 Storybook 또는 단일 `FeedBackList`에 mock data 주입
@@ -465,7 +465,7 @@ export const FEEDBACK_TAB = {
 | # | 작업 | 파일 |
 |---|------|------|
 | 5 | `feedbackKeys` factory | `libs/query-keys/feedback.keys.ts` |
-| 6 | `error.tsx` Route Boundary | `app/user/feedback/**/error.tsx` |
+| 6 | `error.tsx` Route Boundary | `app/feedback/**/error.tsx` |
 | 7 | `AiProvider` BE로 이동 | `backend/ai/infrastructure/providers/` |
 | 8 | `FeedBackErrorFallback` 공통 컴포넌트 | `_components/` |
 | 9 | mutation 훅 통합 | `useGenerateFeedback` 단일화 |
