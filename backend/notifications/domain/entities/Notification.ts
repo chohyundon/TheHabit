@@ -6,7 +6,7 @@ export class Notification {
     public readonly userId: string,
     public readonly isRead: boolean = false,
     public readonly fromUserId?: string | null,
-    public readonly metadata?: any,
+    public readonly metadata?: Record<string, unknown> | null,
     public readonly id?: number,
     public readonly createdAt?: Date
   ) {}

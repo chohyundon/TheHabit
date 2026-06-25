@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import CloseModal from '@/public/icons/icon_close.svg';
 import { Button } from '@/app/_components/buttons/Button';
+import { useModalAnimation } from '@/libs/hooks/useModalAnimation';
 
 interface ConfirmModalProps {
   type: 'positive' | 'negative';
@@ -26,24 +27,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   confirmDisabled = false,
 }) => {
-  const [isVisible, setIsVisible] = useState<boolean>(false);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-      const timer = setTimeout(() => {
-        setIsAnimating(true);
-      }, 10);
-      return () => clearTimeout(timer);
-    } else {
-      setIsAnimating(false);
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
+  const { isVisible, isAnimating } = useModalAnimation(isOpen);
 
   if (!isVisible) return null;
 

@@ -7,7 +7,7 @@ export interface CreateNotificationRequest {
   message: string;
   userId: string;
   fromUserId?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown> | null;
 }
 
 export class CreateNotificationUsecase {

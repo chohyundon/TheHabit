@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { tabItem } from '@/public/consts/tabItem';
 import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
 import { useRouter } from 'next/navigation';
@@ -11,14 +11,14 @@ import Image from 'next/image';
 export const TabNavigation = () => {
   const router = useRouter();
   const [isHover, setIsHover] = useState<string>('');
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
   const { userInfo } = useGetUserInfo();
   const [isOpen, setIsOpen] = useState(false);
   const nickname = userInfo?.nickname;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const isMouseHover = (name: string) => {
     setIsHover(name);
@@ -62,7 +62,7 @@ export const TabNavigation = () => {
             </li>
           ))}
           <li className='absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#93D50B] cursor-pointer hover:scale-105 transition-transform duration-200 hover:opacity-95 flex items-center justify-center rounded-full shadow-lg'>
-            <Link href={userInfo?.nickname ? `/user/dashboard/${userInfo.nickname}` : '/demo'}>
+            <Link href={userInfo?.nickname ? `/dashboard/${userInfo.nickname}` : '/demo'}>
               <Image src='/icons/home.svg' alt='홈으로 이동' width={24} height={24} />
             </Link>
           </li>

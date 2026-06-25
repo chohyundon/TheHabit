@@ -15,7 +15,7 @@ export const SocialLogin = () => {
           width={60}
           height={60}
           className='cursor-pointer hover:scale-110 transition-all duration-300'
-          onClick={() => signIn('google', { callbackUrl: '/user/dashboard' })}
+          onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
         />
       </div>
     </div>

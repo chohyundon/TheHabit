@@ -41,7 +41,7 @@
 
 ### 3. 피드백 생성 실패 시 Toast 표시 `High`
 
-**파일** `app/user/feedback/_components/FeedBackDetail.tsx`
+**파일** `app/feedback/_components/FeedBackDetail.tsx`
 
 피드백 생성 실패 시 `console.error`만 있고 사용자에게 아무 메시지도 표시되지 않았음.
 
@@ -64,7 +64,7 @@
 
 ### 5. 빈 상태 메시지 수정 `Medium`
 
-**파일** `app/user/feedback/[nickname]/[id]/_components/FeedBackById.tsx`
+**파일** `app/feedback/[nickname]/[id]/_components/FeedBackById.tsx`
 
 피드백이 없을 때 "루틴을 생성해주세요"라는 부적절한 메시지가 표시됨.
 
@@ -87,7 +87,7 @@ import 경로도 함께 수정 (`FeedBackPostData.ts`).
 
 ### 7. console.log 전체 제거 `High`
 
-**파일** `app/user/dashboard/_components/ChallengeListSection.tsx`
+**파일** `app/dashboard/_components/ChallengeListSection.tsx`
 
 `getActiveChallengesForSelectedDate` 함수 내부에 디버그용 `console.log` 13개가 남아 있었음. 프로덕션에서 불필요한 로그 출력 및 성능 저하 유발.
 
@@ -102,7 +102,7 @@ import 경로도 함께 수정 (`FeedBackPostData.ts`).
 
 ### 8. Tailwind `h-15` 클래스 수정 `Medium`
 
-**파일** `app/user/dashboard/_components/ChallengeListSection.tsx`
+**파일** `app/dashboard/_components/ChallengeListSection.tsx`
 
 `h-15`는 Tailwind 기본 클래스에 없음 → `h-16`으로 교체 (스켈레톤 로더 3곳).
 
@@ -115,7 +115,7 @@ import 경로도 함께 수정 (`FeedBackPostData.ts`).
 
 ### 9. 날짜 포맷 통일 `Medium`
 
-**파일** `app/user/dashboard/_components/AllChallengeList.tsx` · `CategoryChallengeList.tsx`
+**파일** `app/dashboard/_components/AllChallengeList.tsx` · `CategoryChallengeList.tsx`
 
 `toLocaleDateString()`은 브라우저 로케일에 따라 결과가 달라짐. 이미 프로젝트에 존재하는 `getKoreanDateFromDate()`로 통일.
 

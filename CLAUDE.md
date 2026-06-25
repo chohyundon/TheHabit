@@ -4,23 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Quick Start
 
-**Setup**: Install dependencies with `yarn install` (the project uses Yarn 1.22.22 as the package manager).
+**Setup**: Install dependencies with `bun install` (primary package manager; `npm install` also supported).
 
 **Development**:
 ```bash
-yarn dev          # Start dev server with Turbopack on 0.0.0.0:3000
-yarn build        # Build for production (runs `prisma generate` first)
-yarn start        # Start production server
-yarn lint         # Run ESLint
-yarn format       # Format code with Prettier
-yarn format:check # Check formatting without changes
+bun run dev       # Start dev server on 0.0.0.0:3000
+bun run build     # Build for production
+bun start         # Start production server
+bun run lint      # Run ESLint
+bun run format    # Format code with Prettier
+bun run format:check # Check formatting without changes
 ```
 
 The `.env` file is required for API keys (database, auth providers, S3, OpenAI, etc.) — ask the user if missing.
 
 ## Architecture Overview
 
-This is a **full-stack Next.js 15 application** for a habit-tracking platform ("The:Habit") that provides challenges based on habit formation science (21-day and 66-day challenges).
+This is a **full-stack Next.js 16 application** for a habit-tracking platform ("The:Habit") that provides challenges based on habit formation science (21-day and 66-day challenges).
 
 ### High-Level Structure
 
@@ -29,7 +29,12 @@ TheHabit/
 ├── app/                    # Next.js app router (frontend pages & routes)
 │   ├── api/               # API endpoints (Route Handlers)
 │   ├── _components/       # Reusable React components
-│   ├── user/              # Authenticated user pages (dashboard, profile, etc.)
+│   ├── dashboard/         # Authenticated dashboard
+│   ├── profile/           # User profile pages
+│   ├── feedback/          # Feedback pages
+│   ├── follow/            # Follow list
+│   ├── search/            # User search
+│   ├── notifications/     # Notifications
 │   ├── login/             # Authentication flows
 │   ├── onboarding/        # Onboarding flow
 │   └── demo/              # Demo page (public)
@@ -45,7 +50,7 @@ TheHabit/
 │   ├── stores/           # Zustand global state (modals, etc.)
 │   └── types/            # Shared TypeScript types
 ├── prisma/               # Database schema and migrations
-└── middleware.ts         # Next.js middleware (routing guards)
+└── proxy.ts              # Next.js proxy (routing guards)
 ```
 
 ### Backend Modules (Clean Architecture)
@@ -72,11 +77,11 @@ Example: For creating a challenge:
 
 - **App Router**: `/app` directory contains all pages and API routes
 - **API Routes**: Implemented in `/app/api/[feature]/` as Next.js Route Handlers
-- **Protected Routes**: Middleware in `middleware.ts` enforces authentication (checks `next-auth` session cookies)
+- **Protected Routes**: Proxy in `proxy.ts` enforces authentication on `/dashboard`, `/profile`, `/feedback`, `/follow`, `/search`, `/notifications` (see `public/consts/protectedRoutes.ts`). Legacy `/user/*` URLs redirect with 308.
 - **Routing Guards**:
   - Unauthenticated users redirected to `/onboarding`
   - Onboarding-complete users (cookie `onboarding=done`) can't revisit onboarding
-  - Authenticated users accessing `/` redirect to `/user/dashboard`
+  - Authenticated users accessing `/` redirect to `/dashboard`
 - **State Management**:
   - Global UI state (modals, etc.) → **Zustand** (`libs/stores/`)
   - Server state (routines, challenges, etc.) → **TanStack Query** (via `libs/api/`)
@@ -85,8 +90,8 @@ Example: For creating a challenge:
 
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
-| **Runtime** | Bun (also Yarn/npm compatible) | JavaScript runtime |
-| **Framework** | Next.js 15 | Full-stack React framework with SSR |
+| **Runtime** | Bun (npm also supported) | JavaScript runtime |
+| **Framework** | Next.js 16 | Full-stack React framework with SSR |
 | **Frontend** | React 19, TypeScript, Tailwind CSS, Antd | UI components & styling |
 | **State** | Zustand | Global UI state (modals, etc.) |
 | **Data Fetching** | TanStack Query + Axios | Server state & caching (in `libs/api/`) |
@@ -122,7 +127,7 @@ export async function POST(req: Request) {
 
 ### Authentication & Authorization
 
-- **Protected Pages**: Use middleware (checks `next-auth` session cookie)
+- **Protected Pages**: Use proxy (`proxy.ts`) (checks `next-auth` session cookie)
 - **Protected API Routes**: Extract session in Route Handler using `getServerSession()`
 - **Custom Hooks**: Use permission checks in components (e.g., `useIsOwnProfile()` for ownership verification)
 
@@ -206,7 +211,7 @@ Types: `feat`, `fix`, `docs`, `test`, `refact`, `style`, `chore`
 6. Add TanStack Query hooks in `libs/api/` if needed
 
 **Debugging**:
-- Backend: Check server logs in `yarn dev` output
+- Backend: Check server logs in `bun run dev` output
 - Frontend: Use React DevTools, check browser console
 - Database: Use `prisma studio` to inspect data
 
@@ -222,4 +227,4 @@ TypeScript configured with `@/*` → root directory (e.g., `@/backend/challenges
 
 - PWA notifications are **disabled** — enable by setting `disable: false` in `next.config.ts` and testing service worker
 - Recent fix: VAPID setup deferred to avoid build failures without env vars
-- Onboarding middleware prevents re-entry after completion; redirects to `/user/dashboard` or demo
+- Onboarding proxy prevents re-entry after completion; redirects to `/dashboard` or demo

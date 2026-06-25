@@ -1,15 +1,14 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import CustomInput from '@/app/_components/inputs/CustomInput';
 import { Button } from '@/app/_components/buttons/Button';
 import { LoginItem } from '@/public/consts/loginItem';
 import { useForm, Controller } from 'react-hook-form';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { SocialLogin } from '@/app/login/_components/SocialLogin';
 import { signIn } from 'next-auth/react';
-import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
+import { useRouter } from 'next/navigation';
 import { AxiosError } from 'axios';
 import Toast from '@/app/_components/toasts/Toast';
 
@@ -20,7 +19,6 @@ interface ILoginForm {
 
 export const LoginForm = () => {
   const router = useRouter();
-  const { userInfo, isLoading: isUserInfoLoading } = useGetUserInfo();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,14 +34,6 @@ export const LoginForm = () => {
     },
   });
 
-  // 이미 로그인된 경우 메인 페이지로 리다이렉트
-  useEffect(() => {
-    const nickname = userInfo?.nickname;
-    if (userInfo && !isUserInfoLoading) {
-      router.push(`/user/dashboard/${nickname}`);
-    }
-  }, [userInfo, isUserInfoLoading, router]);
-
   const onSubmit = async (data: ILoginForm) => {
     setError(null);
     setIsLoading(true);
@@ -54,12 +44,11 @@ export const LoginForm = () => {
         password: data.password,
         redirect: false, // 자동 리다이렉트 방지
       });
-      console.log('result', result);
       if (result?.error) {
         setError('이메일 또는 비밀번호가 올바르지 않습니다.');
       } else if (result?.ok) {
         Toast.success('로그인 성공! 🎉');
-        // router.push(`/user/dashboard/${userInfo?.nickname}`);
+        router.replace('/dashboard');
       } else {
         setError('로그인 처리 중 예상치 못한 오류가 발생했습니다.');
       }

@@ -1,0 +1,14 @@
+import React from 'react';
+import UserProfileSection from '@/app/_components/user-profile-section/UserProfileSection';
+import ChallengeListSection from '@/app/dashboard/_components/ChallengeListSection';
+
+const MainPage: React.FC = async () => {
+  return (
+    <main className='px-2 py-2'>
+      <UserProfileSection />
+      <ChallengeListSection />
+    </main>
+  );
+};
+
+export default MainPage;

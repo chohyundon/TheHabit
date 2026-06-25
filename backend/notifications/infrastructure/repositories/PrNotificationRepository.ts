@@ -23,7 +23,7 @@ function toNotification(row: NotificationRow): Notification {
     row.user_id,
     row.is_read,
     row.from_user_id,
-    row.metadata,
+    row.metadata as Record<string, unknown> | null | undefined,
     row.id,
     new Date(row.created_at)
   );
@@ -65,7 +65,7 @@ export class PrNotificationRepository implements INotificationRepository {
 
       if (error) throw new Error(error.message);
 
-      return (data ?? []).map((row) => toNotification(row as NotificationRow));
+      return (data ?? []).map(row => toNotification(row as NotificationRow));
     } catch (error) {
       if (error instanceof Error) throw new Error(error.message);
       throw new Error('사용자 알림 조회에 실패했습니다.');

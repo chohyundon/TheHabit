@@ -1,10 +1,10 @@
 // 동적 경로 생성을 위한 유틸리티 함수들
-export const createUserProfileRoute = (nickname: string) => `/user/profile/${nickname}`;
-export const createUserFeedbackRoute = (nickname: string) => `/user/feedback/${nickname}`;
-export const createUserDashboardRoute = (nickname: string) => `/user/dashboard/${nickname}`;
-export const createUserSearchRoute = (nickname: string) => `/user/search/${nickname}`;
-export const createUserFollowRoute = (nickname: string) => `/user/follow/${nickname}`;
-export const createUserEditRoute = (nickname: string) => `/user/profile/edit/${nickname}`;
+export const createUserProfileRoute = (nickname: string) => `/profile/${nickname}`;
+export const createUserFeedbackRoute = (nickname: string) => `/feedback/${nickname}`;
+export const createUserDashboardRoute = (nickname: string) => `/dashboard/${nickname}`;
+export const createUserSearchRoute = (nickname: string) => `/search/${nickname}`;
+export const createUserFollowRoute = (nickname: string) => `/follow/${nickname}`;
+export const createUserEditRoute = (nickname: string) => `/profile/edit/${nickname}`;
 
 // 챌린지 관련 동적 경로
 export const createChallengeRoute = (nickname: string) => `/challenges/${nickname}`;

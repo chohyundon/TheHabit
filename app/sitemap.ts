@@ -13,22 +13,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: 'https://thehabit.quest/user/dashboard',
+      url: 'https://thehabit.quest/dashboard',
       lastModified: new Date(),
       priority: 0.5,
     },
     {
-      url: 'https://thehabit.quest/user/follow',
+      url: 'https://thehabit.quest/follow',
       lastModified: new Date(),
       priority: 0.5,
     },
     {
-      url: 'https://thehabit.quest/user/profile',
+      url: 'https://thehabit.quest/profile',
       lastModified: new Date(),
       priority: 0.5,
     },
     {
-      url: 'https://thehabit.quest/user/feedback',
+      url: 'https://thehabit.quest/feedback',
       lastModified: new Date(),
       priority: 0.5,
     },

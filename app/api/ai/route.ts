@@ -3,7 +3,7 @@ import { AiRequestDto } from '@/backend/ai/application/dtos/AiRequestDto';
 import { ApiResponse } from '@/backend/shared/types/ApiResponse';
 import { NextRequest, NextResponse } from 'next/server';
 import { AiRepository } from '@/backend/ai/infrastructure/repositories/AiRepository';
-import { OpenAIProvider, GeminiProvider } from '@/app/user/feedback/_components/AiProvider';
+import { OpenAIProvider, GeminiProvider } from '@/app/feedback/_components/AiProvider';
 import { AI_PROVIDER } from '@/public/consts/AiProvider';
 
 interface AiRequestBody {

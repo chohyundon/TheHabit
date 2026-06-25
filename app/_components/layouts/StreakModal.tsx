@@ -3,12 +3,12 @@
 import { useMemo } from 'react';
 import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
 import { useGetDashboardByNickname } from '@/libs/hooks/dashboard-hooks/useGetDashboardByNickname';
-import { calculateSingleChallengeProgress } from '@/app/user/feedback/_components/CalcFeedBackData';
+import { calculateSingleChallengeProgress } from '@/app/feedback/_components/CalcFeedBackData';
 import {
   FeedBackEmptyIcon,
   FeedBackErrorIcon,
   FeedBackSuccessIcon,
-} from '@/app/user/feedback/_components/FeedbackIcon';
+} from '@/app/feedback/_components/FeedbackIcon';
 
 const StreakModal: React.FC = () => {
   const { userInfo, isLoading: userLoading } = useGetUserInfo();

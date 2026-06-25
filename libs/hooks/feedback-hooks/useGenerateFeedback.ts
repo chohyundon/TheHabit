@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { RoutineCompletionDto } from '@/backend/routine-completions/application/dtos/RoutineCompletionDto';
-import { FeedBackPostData } from '@/app/user/feedback/_components/FeedBackPostData';
+import { FeedBackPostData } from '@/app/feedback/_components/FeedBackPostData';
 
 export interface GenerateFeedbackInput {
   challengeId: number;

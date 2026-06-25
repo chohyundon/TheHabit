@@ -11,7 +11,7 @@ import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
 import { useCreateRoutineCompletion } from '@/libs/hooks/routine-completions-hooks/useCreateRoutineCompletion';
 import { useUpdateRoutine } from '@/libs/hooks/routines-hooks/useUpdateRoutine';
 import { useQueryClient } from '@tanstack/react-query';
-import AddRoutineForm from '@/app/user/dashboard/_components/AddRoutineForm';
+import AddRoutineForm from '@/app/dashboard/_components/AddRoutineForm';
 import RoutineCompletionForm from '@/app/_components/challenges-accordion/RoutineCompletionForm';
 import CustomInput from '@/app/_components/inputs/CustomInput';
 import { Toast } from '@/app/_components/toasts/Toast';

@@ -8,7 +8,7 @@ import StreakModal from '@/app/_components/layouts/StreakModal';
 import { useGetUserInfo } from '@/libs/hooks/user-hooks/useGetUserInfo';
 import { useGetDashboardByNickname } from '@/libs/hooks/dashboard-hooks/useGetDashboardByNickname';
 import { useMemo } from 'react';
-import { calculateSingleChallengeProgress } from '@/app/user/feedback/_components/CalcFeedBackData';
+import { calculateSingleChallengeProgress } from '@/app/feedback/_components/CalcFeedBackData';
 import { useRouter } from 'next/navigation';
 
 //TODO : 최장 스트릭 정보 가져오기
